@@ -1,0 +1,5 @@
+-- hello_world.kl
+PROGRAM hello_world
+BEGIN
+  WRITE('Hello, world!',CR)
+END hello_world

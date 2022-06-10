@@ -1,0 +1,120 @@
+PROGRAM datarecorder
+%COMMENT = 'LOG DATA RECORD'
+%SYSTEM
+%NOLOCKGROUP
+%NOABORT=ERROR+COMMAND+TPENABLE
+%NOPAUSE=ERROR+COMMAND+TPENABLE
+%NOPAUSESHFT
+
+VAR
+    logFile    : FILE
+    filename   : STRING[16]
+    
+    clock_var  : INTEGER -- clock count in milliseconds
+    period     : INTEGER -- recording period in milliseconds (8 ms to 127 ms)
+    timeInt    : INTEGER -- actual time
+    timeStr    : STRING[18] -- formated
+    
+    IntANGa1,IntANGa2,IntANGa3,IntANGa4,IntANGa5,IntANGa6    : REAL
+    IntANGa1Str, IntANGa2Str, IntANGa3Str,IntANGa4Str, IntANGa5Str, IntANGa6Str: STRING[9]
+    write_line : STRING[100]
+
+    entry      : INTEGER
+    status     : INTEGER
+    -- tests
+    test       : INTEGER
+    clocky     : INTEGER
+    PI         : REAL
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-- routine to get angle of axis
+ROUTINE GET_INT_ANG(active : BOOLEAN)
+
+BEGIN
+
+    IF active=TRUE THEN
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[1]', IntANGa1, status)
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[2]', IntANGa2, status)
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[3]', IntANGa3, status)
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[4]', IntANGa4, status)
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[5]', IntANGa5, status)
+        GET_VAR(entry, '*SYSTEM*', '$MOR_GRP_SV[1].$CUR_SV_ANG[6]', IntANGa6, status)
+
+        IntANGa3 = IntANGa2+IntANGa3
+        IntANGa1 = IntANGa1*180/PI
+        IntANGa2 = IntANGa2*180/PI
+        IntANGa3 = IntANGa3*180/PI
+        IntANGa4 = IntANGa4*180/PI
+        IntANGa5 = IntANGa5*180/PI
+        IntANGa6 = IntANGa6*180/PI
+    ENDIF
+
+END GET_INT_ANG
+-----------------------------------------------------------------------------------
+-- main routine
+BEGIN -- execute the program
+    PI = 3.14159265358979323846
+    clock_var = 0
+    -- begin the clock time count
+    CONNECT TIMER TO clock_var
+    
+    period = 1 -- ms
+
+    -- get actual time and convert it into string
+    GET_TIME(timeInt)
+    CNV_TIME_STR(timeInt, timeStr)
+
+    filename = 'UD1:'+'log'+'.txt'
+    
+    entry = 0
+    status = 0
+    
+    -- tests
+    -- test = 0
+    -- clocky = 0
+    
+    
+    -- open the log file and overwrite previous
+    -- OPEN FILE logFile ('W', filename)
+    -- write actual time and make a carriage return
+    -- WRITE logFile (timeStr, CR)
+    -- CLOSE FILE logFile
+
+
+    OPEN FILE logFile ('AP', filename)
+    -- WRITE logFile (timeStr, CR)
+    WRITE logFile ('timestamp,J1,J2,J3,J4,J5,J6', CR)
+     -- start recording
+    REPEAT
+      -- clocky = clock_var
+      -- test = clocky+period
+      GET_INT_ANG(TRUE) -- call internal angle routine
+      
+      CNV_REAL_STR(IntANGa1, 9, 4, IntANGa1Str)
+      CNV_REAL_STR(IntANGa2, 9, 4, IntANGa2Str)
+      CNV_REAL_STR(IntANGa3, 9, 4, IntANGa3Str)
+      CNV_REAL_STR(IntANGa4, 9, 4, IntANGa4Str)
+      CNV_REAL_STR(IntANGa5, 9, 4, IntANGa5Str)
+      CNV_REAL_STR(IntANGa6, 9, 4, IntANGa6Str)
+    --   WRITE logFile(clock_var)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa1Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa2Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa3Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa4Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa5Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa6Str,CR)
+      WRITE logFile(clock_var)
+      write_line=','+IntANGa1Str+','+IntANGa2Str+','+IntANGa3Str+','+IntANGa4Str+','+IntANGa5Str+','+IntANGa6Str
+      WRITE logFile(write_line,CR)
+      DELAY(period)
+    UNTIL(DOUT[101]=OFF)
+    -- stop recording, close log file
+    CLOSE FILE logFile
+-- end of program
+END datarecorder

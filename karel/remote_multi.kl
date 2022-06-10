@@ -1,0 +1,38 @@
+PROGRAM remote
+%COMMENT = 'REMOTE'
+%SYSTEM
+%NOLOCKGROUP
+%NOABORT=ERROR+COMMAND+TPENABLE
+%NOPAUSE=ERROR+COMMAND+TPENABLE
+%NOPAUSESHFT
+
+VAR
+    STATUS      : INTEGER
+    return_code : INTEGER
+    clock_var    : INTEGER
+-----------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
+-- main routine
+BEGIN -- execute the program
+    
+    -- delete previous ls and log
+    KCL('DELETE FILE md:\TMPA.LS YES',STATUS)
+    KCL('DELETE FILE md:\TMPB.LS YES',STATUS)
+    KCL('DELETE FILE ud1:\log.txt YES',STATUS)
+
+    -- -- copy ud1 tmp to mp
+    KCL('COPY ud1:\TMPA.LS TO md:\TMPA.LS',STATUS)
+    KCL('COPY ud1:\TMPB.LS TO md:\TMPB.LS',STATUS)
+    KCL('DELETE FILE ud1:\TMPA.LS YES',STATUS)
+    KCL('DELETE FILE ud1:\TMPB.LS YES',STATUS)
+
+    -- call LS
+    DOUT[102]=ON
+    WAIT FOR DOUT[102]=OFF
+
+    -- end
+    return_code = 204
+
+-- end of program
+END remote
