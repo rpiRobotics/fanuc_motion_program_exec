@@ -20,7 +20,8 @@ For dual robot arms, the following additional option is required.
 
 The installation of modulel in RoboGuide includes setting up a cell and loading necessary scripts.
 
-- See
+- Single Robot: See [robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/robot_setup.md)
+- Multi Robot: See [multi_robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_setup.md)
 
 ### Real Robot
 
@@ -170,7 +171,7 @@ timestamp,J1,J2,J3,J4,J5,J6
 
 ## Multi-Robot Example
 
-Two robots can be controller using Robot Options `Multi-Group Motion (J601)`/ See [multi_robot_setup.md]() for setup instructions.
+Two robots can be controller using Robot Options `Multi-Group Motion (J601)`/ See [multi_robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_setup.md) for setup instructions.
 
 The two robot needs to have different `group_num` which are given in the `robtarget` or `jointtarget`. Execute `MAIN_MULT` (instead of `MAIN`) in RoboGuide before using the python module. The `execute_motion_program_multi` function of `FANUCClient` is used to send the two tp program to the controller for the two robots.
 
