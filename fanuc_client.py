@@ -114,11 +114,12 @@ def joint2robtarget(q,robot,group,uframe,utool):
                     confdata(FN,UD,BF,tn1,tn2,tn3),[0]*6)
 
 class TPMotionProgram(object):
-    def __init__(self) -> None:
+    def __init__(self,t_num=2,u_num=1) -> None:
         
         self.progs = []
         self.target = []
-        self.t_num = 0
+        self.t_num = t_num
+        self.u_num = u_num
 
     def moveJ(self,target,vel,vel_unit,zone):
         '''
@@ -207,7 +208,7 @@ class TPMotionProgram(object):
         filename = 'TMP'
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM=0 ;\n   2:  UTOOL_NUM=2 ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
@@ -245,7 +246,7 @@ class TPMotionProgram(object):
         
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM=1 ;\n   2:  UTOOL_NUM=2 ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
@@ -289,7 +290,7 @@ class TPMotionProgram(object):
 
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
-        mo += '   1:  UFRAME_NUM=1 ;\n   2:  UTOOL_NUM=2 ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n'
         line_num=3
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
@@ -405,13 +406,15 @@ def multi_robot():
     tp1 = TPMotionProgram()
     tp2 = TPMotionProgram()
 
-    jt11 = jointtarget(1,1,1,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
-    pt12 = robtarget(1,1,1,[994.0,924.9,1739.5],[163.1,1.5,-1.0],confdata('N','U','T',0,0,0),[0]*6)
-    pt13 = robtarget(1,1,1,[1620.0,0,1930.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    # these are for motion group 1 (robot 1)
+    jt11 = jointtarget(1,1,2,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
+    pt12 = robtarget(1,1,2,[994.0,924.9,1739.5],[163.1,1.5,-1.0],confdata('N','U','T',0,0,0),[0]*6)
+    pt13 = robtarget(1,1,2,[1620.0,0,1930.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
 
-    jt21 = jointtarget(2,1,1,[-49.7,4.3,-30.9,-20.9,-35.8,52.1],[0]*6)
-    pt22 = robtarget(2,1,1,[1383.1,-484.0,940.6],[171.5,-26.8,-9.8],confdata('N','U','T',0,0,0),[0]*6)
-    pt23 = robtarget(2,1,1,[1166.0,0,1430.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    # these are for motion group 2 (robot 2)
+    jt21 = jointtarget(2,1,2,[-49.7,4.3,-30.9,-20.9,-35.8,52.1],[0]*6)
+    pt22 = robtarget(2,1,2,[1383.1,-484.0,940.6],[171.5,-26.8,-9.8],confdata('N','U','T',0,0,0),[0]*6)
+    pt23 = robtarget(2,1,2,[1166.0,0,1430.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
 
     tp1.moveJ(jt11,100,'%',-1)
     tp1.moveL(pt12,500,'mmsec',100)
@@ -433,10 +436,10 @@ def single_robot():
 
     tp = TPMotionProgram()
 
-    pt1 = robtarget(1,0,1,[1850,200,290],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
-    pt2 = robtarget(1,0,1,[1850,200,589],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
-    jt1 = jointtarget(1,0,1,[0,20,-10,0,-20,10],[0]*6)
-    pt3 = robtarget(1,0,1,[1850,250,400],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    pt1 = robtarget(1,1,2,[1850,200,290],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    pt2 = robtarget(1,1,2,[1850,200,589],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    jt1 = jointtarget(1,1,2,[0,20,-10,0,-20,10],[0]*6)
+    pt3 = robtarget(1,1,2,[1850,250,400],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
     
     tp.moveL(pt1,50,'mmsec',100)
     tp.moveL(pt2,50,'mmsec',-1)
