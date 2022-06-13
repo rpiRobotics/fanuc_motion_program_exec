@@ -47,7 +47,7 @@ Execute `MAIN` by selecting the `MAIN` program in the `Programs` tab and pressin
 
 You can now run the python module. You can find the example code in `fanuc_client.py`
 
-PLease consault debug if you run the python module before you execute `MAIN`.
+PLease consault [common_qa.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/common_qa.md) if you run the python module before you execute `MAIN`.
 
 ### Python Module
 
