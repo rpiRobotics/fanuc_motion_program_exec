@@ -3,9 +3,7 @@
 # and execute LS program
 ########
 
-from fileinput import filename
 import time
-from tkinter import N
 import numpy as np
 from typing import NamedTuple
 import itertools

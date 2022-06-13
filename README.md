@@ -37,6 +37,8 @@ pip install . --user
 
 Note that the module is only tested with `python3`.
 
+The module required the installation of [rpi_general_robotics_toolbox_py](https://github.com/rpiRobotics/rpi_general_robotics_toolbox_py).
+
 ## Usage
 
 ### RoboGuide
@@ -45,7 +47,7 @@ Execute `MAIN` by selecting the `MAIN` program in the `Programs` tab and pressin
 
 ![](doc/figures/usage.png)
 
-You can now run the python module. You can find the example code in `fanuc_client.py`
+You can now run the python module. You can find the example code in `fanuc_motion_program_exec_client.py`
 
 PLease consault [common_qa.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/common_qa.md) if you run the python module before you execute `MAIN`.
 
