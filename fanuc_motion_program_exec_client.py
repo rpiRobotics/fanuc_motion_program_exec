@@ -112,12 +112,13 @@ def joint2robtarget(q,robot,group,uframe,utool):
                     confdata(FN,UD,BF,tn1,tn2,tn3),[0]*6)
 
 class TPMotionProgram(object):
-    def __init__(self,t_num=2,u_num=1) -> None:
+    def __init__(self,tool_num=2,uframe_num=1) -> None:
         
         self.progs = []
         self.target = []
-        self.t_num = t_num
-        self.u_num = u_num
+        self.t_num = 0
+        self.tool_num = tool_num
+        self.uframe_num = uframe_num
 
     def moveJ(self,target,vel,vel_unit,zone):
         '''
@@ -206,7 +207,7 @@ class TPMotionProgram(object):
         filename = 'TMP'
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
@@ -244,7 +245,7 @@ class TPMotionProgram(object):
         
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
