@@ -159,9 +159,13 @@ class TPMotionProgram(object):
         self.t_num += 1
         mo += 'P['+str(self.t_num)+'] '
         
-        # only support mm/sec for now
-        vel = np.min([np.max([vel,1]),2000])
-        mo += str(vel) + 'mm/sec '
+        # only support mm/sec and msec for now
+        if vel_unit == 'msec':
+            vel = np.min([np.max([vel,1]),32000])
+            mo += str(vel) + 'msec '
+        else:
+            vel = np.min([np.max([vel,1]),2000])
+            mo += str(vel) + 'mm/sec '
         
         if zone < 0:
             mo += 'FINE '
