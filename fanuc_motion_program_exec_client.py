@@ -148,7 +148,7 @@ class TPMotionProgram(object):
 
         self.progs.append(mo)
 
-    def moveL(self,target,vel,vel_unit,zone):
+    def moveL(self,target,vel,vel_unit,zone,options):
         '''
         
         '''
@@ -173,11 +173,14 @@ class TPMotionProgram(object):
             zone = np.min([zone,100])
             mo += 'CNT'+str(zone)+' '
         
+        # add options, currently only COORD
+        mo += options+' '
+
         mo += ';'
 
         self.progs.append(mo)
 
-    def moveC(self,mid_target,end_target,vel,vel_unit,zone):
+    def moveC(self,mid_target,end_target,vel,vel_unit,zone,options):
         '''
         
         '''
@@ -203,6 +206,9 @@ class TPMotionProgram(object):
             zone = np.min([zone,100])
             mo += 'CNT'+str(zone)+' '
         
+        # add options, currently only COORD
+        mo += options+' '
+
         mo += ';'
 
         self.progs.append(mo)
@@ -293,7 +299,7 @@ class TPMotionProgram(object):
 
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.u_num)+' ;\n   2:  UTOOL_NUM='+str(self.t_num)+' ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
         line_num=3
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
@@ -328,6 +334,57 @@ class TPMotionProgram(object):
 
         with open(filename+'.LS', "w") as f:
             f.write(mo)
+    
+    def dump_program_coord(self,filename,tpmp):
+
+        # motion group
+        dg = '1,1,*,*,*'
+
+        # program name, attribute, motion
+        mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
+        mo += '   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        line_num=3
+        for prog in self.progs:
+            mo += '   '+str(line_num)+':'
+            mo += prog
+            mo += '\n'
+            line_num += 1
+        mo += '   '+str(line_num)+':  DO[101]=OFF ;\n'
+
+        # pose data
+        mo += '/POS\n'
+        for t_num in range(self.t_num):
+
+            all_target=[]
+            all_target.append(tpmp.target[t_num])
+            all_target.append(self.target[t_num])
+
+            mo+='P['+str(t_num+1)+']{\n'
+            for i in range(2):
+                target=all_target[i]
+                if type(target) == jointtarget:
+                    mo+='   GP'+str(target.group)+':\n'
+                    mo+='   UF : '+str(target.uframe)+', UT : '+str(target.utool)+',\n'
+                    mo+='   J1 = '+format(round(target.robax[0],3),'.3f')+' deg,  J2 = '+format(round(target.robax[1],3),'.3f')+' deg,  J3 = '+format(round(target.robax[2],3)-round(target.robax[1],3),'.3f')+' deg,\n'
+                    mo+='   J4 = '+format(round(target.robax[3],3),'.3f')+' deg,  J5 = '+format(round(target.robax[4],3),'.3f')+' deg,  J6 = '+format(round(target.robax[5],3),'.3f')+' deg\n'
+                if type(target) == robtarget:
+                    mo+='   GP'+str(target.group)+':\n'
+                    mo+='   UF : '+str(target.uframe)+', UT : '+str(target.utool)+',     CONFIG : \''+\
+                        target.robconf.J5+' '+target.robconf.J3+' '+target.robconf.J1+', '+\
+                        str(target.robconf.turn4)+', '+str(target.robconf.turn5)+', '+str(target.robconf.turn6)+'\',\n'
+                    mo+='   X = '+format(round(target.trans[0],3),'.3f')+' mm,  Y = '+format(round(target.trans[1],3),'.3f')+' mm,  Z = '+format(round(target.trans[2],3),'.3f')+' mm,\n'
+                    mo+='   W = '+format(round(target.rot[0],3),'.3f')+' deg,  P = '+format(round(target.rot[1],3),'.3f')+' deg,  R = '+format(round(target.rot[2],3),'.3f')+' deg\n'
+            mo+='};\n'
+        
+        # end
+        mo += '/END\n'
+
+        with open(filename+'.LS', "w") as f:
+            f.write(mo)
+
+        pass
+    
         
         
 
@@ -381,8 +438,11 @@ class FANUCClient(object):
         with open('TMPB.LS','rb') as the_prog:
             self.robot_ftp.storlines('STOR TMPB.LS',the_prog)
 
-        motion_url='http://'+self.robot_ip+'/karel/remote'
-        res = urlopen(motion_url)
+        try:
+            motion_url='http://'+self.robot_ip+'/karel/remote'
+            res = urlopen(motion_url)
+        except urllib.error.HTTPError:
+            pass
 
         while True:
             try:
@@ -392,23 +452,83 @@ class FANUCClient(object):
             except urllib.error.HTTPError:
                 time.sleep(1)
 
-        if os.path.exists("TMPA.LS"):
-            os.remove("TMPA.LS")
+        if os.path.exists("TMP.LS"):
+            os.remove("TMP.LS")
         else:
-            print("TMPA.LS is deleted.")
-        if os.path.exists("TMPB.LS"):
-            os.remove("TMPB.LS")
+            print("TMP.LS is deleted.")
+
+        return res.read()
+    
+    def execute_motion_program_coord(self, tp_lead: TPMotionProgram, tp_follow: TPMotionProgram):
+
+        assert tp_lead.t_num == tp_follow.t_num, "TP1 and TP2 must have exact same motions (target pose)."
+
+        # # save a temp
+        tp_lead.dump_program_coord('TMP',tp_follow)
+
+        # # copy to robot via ftp
+        with open('TMP.LS','rb') as the_prog:
+            self.robot_ftp.storlines('STOR TMP.LS',the_prog)
+
+        try:
+            motion_url='http://'+self.robot_ip+'/karel/remote'
+            res = urlopen(motion_url)
+        except urllib.error.HTTPError:
+            pass
+
+        while True:
+            try:
+                file_url='http://'+self.robot_ip+'/ud1/log.txt'
+                res = urlopen(file_url)
+                break
+            except urllib.error.HTTPError:
+                time.sleep(1)
+
+        if os.path.exists("TMP.LS"):
+            os.remove("TMP.LS")
         else:
-            print("TMPB.LS is deleted.")
+            print("TMP.LS is deleted.")
 
         return res.read()
 
+def multi_robot_coord():
+    
+    tp_lead = TPMotionProgram()
+    tp_follow = TPMotionProgram()
+
+    # these are for follower robot, follower must be motion group 1
+    jt11 = jointtarget(1,1,2,[-49.7,4.3,-30.9,-20.9,-35.8,52.1],[0]*6)
+    pt12 = robtarget(1,1,2,[1383.1,-484.0,940.6],[171.5,-26.8,-9.8],confdata('N','U','T',0,0,0),[0]*6)
+    pt13 = robtarget(1,1,2,[1166.0,0,1430.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+
+    # these are for leader robot, leader must be motion group 2
+    jt21 = jointtarget(2,1,2,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
+    pt22 = robtarget(2,1,2,[994.0,924.9,1739.5],[163.1,1.5,-1.0],confdata('N','U','T',0,0,0),[0]*6)
+    pt23 = robtarget(2,1,2,[1620.0,0,1930.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+
+    # two program must have the exact same motion primitives
+    tp_follow.moveJ(jt11,100,'%',-1) # moveJ does not support coordinated motion
+    tp_follow.moveL(pt12,500,'mmsec',100,'COORD') # add 'COORD' option
+    tp_follow.moveL(pt13,500,'mmsec',-1,'COORD')
+
+    tp_lead.moveJ(jt21,100,'%',-1)
+    tp_lead.moveL(pt22,500,'mmsec',100,'COORD')
+    tp_lead.moveL(pt23,500,'mmsec',-1,'COORD')
+
+    client = FANUCClient()
+    res = client.execute_motion_program_coord(tp_lead,tp_follow) # lead put in front
+
+    with open("fanuc_log.csv","wb") as f:
+        f.write(res)
+    
+    print(res.decode('utf-8'))
 
 def multi_robot():
 
     tp1 = TPMotionProgram()
     tp2 = TPMotionProgram()
 
+    # use uframe=1 and utool=2
     # these are for motion group 1 (robot 1)
     jt11 = jointtarget(1,1,2,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
     pt12 = robtarget(1,1,2,[994.0,924.9,1739.5],[163.1,1.5,-1.0],confdata('N','U','T',0,0,0),[0]*6)
@@ -472,7 +592,9 @@ def main():
     # single robot
     # single_robot()
     # multi robot
-    multi_robot()
+    # multi_robot()
+    # multi robot with coordinated motion
+    multi_robot_coord()
 
 if __name__ == "__main__":
     main()
