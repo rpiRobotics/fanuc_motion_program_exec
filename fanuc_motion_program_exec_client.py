@@ -148,7 +148,7 @@ class TPMotionProgram(object):
 
         self.progs.append(mo)
 
-    def moveL(self,target,vel,vel_unit,zone,options):
+    def moveL(self,target,vel,vel_unit,zone,options=''):
         '''
         
         '''
@@ -180,7 +180,7 @@ class TPMotionProgram(object):
 
         self.progs.append(mo)
 
-    def moveC(self,mid_target,end_target,vel,vel_unit,zone,options):
+    def moveC(self,mid_target,end_target,vel,vel_unit,zone,options=''):
         '''
         
         '''
