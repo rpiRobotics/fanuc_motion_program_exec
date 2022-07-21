@@ -342,8 +342,8 @@ class TPMotionProgram(object):
 
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
-        mo += '   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
+        mo += '   1:  DO[101]=ON ;\n   2:  RUN DATARECORDER ;\n'
         line_num=3
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
