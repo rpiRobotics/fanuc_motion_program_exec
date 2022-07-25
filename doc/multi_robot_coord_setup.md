@@ -89,8 +89,8 @@ Right click on the `Files`, `Add`,and add `remote_mult.kl`, `record_data_mult.kl
 
 ![](figures/step_16.png)
 
-Expand the `Files` tab by clicking the plus button on the left. Right click on `MAIN_MULT.LS`, `Load`. RoboGuide will load the `LS` program to the controller. Right click on `record_data_mult.kl` and `Build`. A window will show that the translation is successful. Redo the same process with `remote_mult.kl`. RoboGuide first compile and then load the `.kl` or `Karel` program to the controller. You should also see `record_data_mult.pc` and `remote_mult.pc`. They are the compiled karel program. Expand the `Programs` tab and you should see `DATARECORDER`, `REMOTE` and `MAIN` are listed.
+Expand the `Files` tab by clicking the plus button on the left. Right click on `MAIN.LS`, `Load`. RoboGuide will load the `LS` program to the controller. Right click on `record_data_mult.kl` and `Build`. A window will show that the translation is successful. Redo the same process with `remote.kl`. RoboGuide first compile and then load the `.kl` or `Karel` program to the controller. You should also see `record_data_mult.pc` and `remote.pc`. They are the compiled karel program. Expand the `Programs` tab and you should see `DATARECORDER`, `REMOTE` and `MAIN` are listed.
 
-![](figures/step_17_m.png)
+![](figures/step_17_coord.png)
 
 Your robot is now ready to run!
