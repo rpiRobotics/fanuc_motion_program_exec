@@ -49,7 +49,7 @@ After the setup process in the virtual teach pendent is done, You should see you
 
 ## Robot Controller Setup
 
-We are now setting up payload, communication, user and tool frames. Click the virtual teach pandant button on the top left (under the `File` button). You should see the teach pandant pop up. Click on the blinking triangle on the top right of the teach pandant to setup payload information.
+We are now setting up payload, communication, user and tool frames. Click the virtual teach pandant button on the top left (under the `File` button). You should see the teach pandant pop up. Click on the blinking triangle on the top right of the teach pandant to setup payload information. Remeber that the motion will change when the payload information change. **Especially when the payload is closed to limit.**
 
 ![](figures/step_10.png)
 

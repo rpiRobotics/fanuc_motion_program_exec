@@ -496,6 +496,9 @@ def multi_robot_coord():
     tp_lead = TPMotionProgram()
     tp_follow = TPMotionProgram()
 
+    # robtarget(motion group, uframe, utool, [x,y,z], [w,p,r], confdata, external axis)
+    # jointtarget(motion group, uframe, utool, [j1,j2,j3,j4,j5,j6], confdata, external axis)
+
     # these are for follower robot, follower must be motion group 1
     jt11 = jointtarget(1,1,2,[-49.7,4.3,-30.9,-20.9,-35.8,52.1],[0]*6)
     pt12 = robtarget(1,1,2,[1383.1,-484.0,940.6],[171.5,-26.8,-9.8],confdata('N','U','T',0,0,0),[0]*6)
@@ -528,6 +531,9 @@ def multi_robot():
     tp1 = TPMotionProgram()
     tp2 = TPMotionProgram()
 
+    # robtarget(motion group, uframe, utool, [x,y,z], [w,p,r], confdata, external axis)
+    # jointtarget(motion group, uframe, utool, [j1,j2,j3,j4,j5,j6], confdata, external axis)
+
     # use uframe=1 and utool=2
     # these are for motion group 1 (robot 1)
     jt11 = jointtarget(1,1,2,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
@@ -559,8 +565,10 @@ def single_robot():
 
     tp = TPMotionProgram()
 
+    # robtarget(motion group, uframe, utool, [x,y,z], [w,p,r], confdata, external axis)
     pt1 = robtarget(1,1,2,[1850,200,290],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
     pt2 = robtarget(1,1,2,[1850,200,589],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
+    # jointtarget(motion group, uframe, utool, [j1,j2,j3,j4,j5,j6], confdata, external axis)
     jt1 = jointtarget(1,1,2,[0,20,-10,0,-20,10],[0]*6)
     pt3 = robtarget(1,1,2,[1850,250,400],[-180,0,0],confdata('N','U','T',0,0,0),[0]*6)
     

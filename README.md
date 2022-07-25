@@ -22,6 +22,7 @@ The installation of modulel in RoboGuide includes setting up a cell and loading 
 
 - Single Robot: See [robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/robot_setup.md)
 - Multi Robot: See [multi_robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_setup.md)
+- Multi Robot with Coordinated Motion [multi_robot_coord_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_coord_setup.md)
 
 ### Real Robot
 
