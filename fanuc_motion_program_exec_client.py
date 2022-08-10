@@ -452,10 +452,14 @@ class FANUCClient(object):
             except urllib.error.HTTPError:
                 time.sleep(1)
 
-        if os.path.exists("TMP.LS"):
-            os.remove("TMP.LS")
+        if os.path.exists("TMPA.LS"):
+            os.remove("TMPA.LS")
         else:
-            print("TMP.LS is deleted.")
+            print("TMPA.LS is deleted.")
+        if os.path.exists("TMPB.LS"):
+            os.remove("TMPB.LS")
+        else:
+            print("TMPB.LS is deleted.")
 
         return res.read()
     
