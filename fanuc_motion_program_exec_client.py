@@ -398,6 +398,12 @@ class FANUCClient(object):
     
     def execute_motion_program(self, tpmp: TPMotionProgram):
 
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+
         # # save a temp
         tpmp.dump_program('TMP')
 
@@ -427,6 +433,16 @@ class FANUCClient(object):
         return res.read()
     
     def execute_motion_program_multi(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
+
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[103]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[104]%20=%20off'
+        urlopen(do_url)
 
         # # save a temp
         tpmp1.dump_program_multi('TMPA',1)
@@ -466,6 +482,16 @@ class FANUCClient(object):
     def execute_motion_program_coord(self, tp_lead: TPMotionProgram, tp_follow: TPMotionProgram):
 
         assert tp_lead.t_num == tp_follow.t_num, "TP1 and TP2 must have exact same motions (target pose)."
+
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[103]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[104]%20=%20off'
+        urlopen(do_url)
 
         # # save a temp
         tp_lead.dump_program_coord('TMP',tp_follow)
