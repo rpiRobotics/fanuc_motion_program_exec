@@ -13,6 +13,7 @@ import urllib
 import os
 import general_robotics_toolbox as rox
 import math
+import threading
 
 class pose(NamedTuple):
     trans: np.ndarray # [x,y,z]
@@ -389,12 +390,18 @@ class TPMotionProgram(object):
         
 
 class FANUCClient(object):
-    def __init__(self,robot_ip='127.0.0.2') -> None:
+    def __init__(self,robot_ip='127.0.0.2',robot_user='robot',robot_ip2=None,robot_user2=None) -> None:
 
         self.robot_ip = robot_ip
-        self.robot_ftp = FTP(self.robot_ip,user='robot')
+        self.robot_ftp = FTP(self.robot_ip,user=robot_user)
         self.robot_ftp.login()
         self.robot_ftp.cwd('UD1:')
+
+        if robot_ip2 is not None:
+            self.robot_ip2 = robot_ip2
+            self.robot_ftp2 = FTP(self.robot_ip2,user=robot_user2)
+            self.robot_ftp2.login()
+            self.robot_ftp2.cwd('UD1:')
     
     def execute_motion_program(self, tpmp: TPMotionProgram):
 
@@ -520,6 +527,95 @@ class FANUCClient(object):
             print("TMP.LS is deleted.")
 
         return res.read()
+    
+    def run_motion_thread(self,robot_ip):
+
+        # call motion
+        try:
+            motion_url='http://'+robot_ip+'/karel/remote'
+            res = urlopen(motion_url)
+        except urllib.error.HTTPError:
+            print("Run motion error")
+            self.robot2_flag=False
+            return
+        # get logged data
+        while True:
+            try:
+                file_url='http://'+robot_ip+'/ud1/log.txt'
+                res = urlopen(file_url)
+                break
+            except (urllib.error.HTTPError,KeyboardInterrupt):
+                time.sleep(0.1)
+        self.robot2_data=res.read()
+        self.robot2_flag=False
+    
+    def execute_motion_program_thread(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
+
+        if self.robot_ip2 is None:
+            print("There's no robot2 ip address.")
+            return
+
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+
+        # # save a temp
+        tpmp1.dump_program('TMP')
+        # # copy to robot via ftp
+        with open('TMP.LS','rb') as the_prog:
+            self.robot_ftp.storlines('STOR TMP.LS',the_prog)
+        # # save a temp
+        tpmp2.dump_program('TMP')
+        # # copy to robot via ftp
+        with open('TMP.LS','rb') as the_prog:
+            self.robot_ftp2.storlines('STOR TMP.LS',the_prog)
+        # return 1,2
+        # time.sleep(3)
+        
+        # call motion
+        self.robot2_data=None
+        self.robot2_flag=True
+        robot2_thread=threading.Thread(target=self.run_motion_thread,args=(self.robot_ip2,))
+        robot2_thread.start()
+        try:
+            motion_url='http://'+self.robot_ip+'/karel/remote'
+            res = urlopen(motion_url)
+        except (urllib.error.HTTPError,KeyboardInterrupt):
+            self.robot2_flag=False
+            robot2_thread.join()
+        # get logged data
+        while True:
+            try:
+                file_url='http://'+self.robot_ip+'/ud1/log.txt'
+                res = urlopen(file_url)
+                break
+            except (urllib.error.HTTPError):
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                self.robot2_flag=False
+                return
+        # wait for robot2
+        try:
+            while self.robot2_flag:
+                time.sleep(0.01)
+        except (KeyboardInterrupt):
+            return
+            
+        
+        # remove temporary TMP files
+        if os.path.exists("TMP.LS"):
+            os.remove("TMP.LS")
+        else:
+            print("TMP.LS is deleted.")
+
+        return res.read(),self.robot2_data
 
 def multi_robot_coord():
     
@@ -628,11 +724,11 @@ def single_robot():
 def main():
 
     # single robot
-    # single_robot()
+    single_robot()
     # multi robot
     # multi_robot()
     # multi robot with coordinated motion
-    multi_robot_coord()
+    # multi_robot_coord()
 
 if __name__ == "__main__":
     main()
