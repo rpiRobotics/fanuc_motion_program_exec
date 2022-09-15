@@ -536,18 +536,7 @@ class FANUCClient(object):
             res = urlopen(motion_url)
         except urllib.error.HTTPError:
             print("Run motion error")
-            self.robot2_flag=False
             return
-        # get logged data
-        while True:
-            try:
-                file_url='http://'+robot_ip+'/ud1/log.txt'
-                res = urlopen(file_url)
-                break
-            except (urllib.error.HTTPError,KeyboardInterrupt):
-                time.sleep(0.1)
-        self.robot2_data=res.read()
-        self.robot2_flag=False
     
     def execute_motion_program_thread(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
 
@@ -577,37 +566,39 @@ class FANUCClient(object):
         with open('TMP.LS','rb') as the_prog:
             self.robot_ftp2.storlines('STOR TMP.LS',the_prog)
         # return 1,2
-        # time.sleep(3)
+        time.sleep(0.01)
         
         # call motion
         self.robot2_data=None
-        self.robot2_flag=True
-        robot2_thread=threading.Thread(target=self.run_motion_thread,args=(self.robot_ip2,))
+        robot2_thread=threading.Thread(target=self.run_motion_thread,args=(self.robot_ip2,), daemon=True)
         robot2_thread.start()
         try:
             motion_url='http://'+self.robot_ip+'/karel/remote'
             res = urlopen(motion_url)
         except (urllib.error.HTTPError,KeyboardInterrupt):
-            self.robot2_flag=False
             robot2_thread.join()
         # get logged data
         while True:
             try:
                 file_url='http://'+self.robot_ip+'/ud1/log.txt'
-                res = urlopen(file_url)
+                res1 = urlopen(file_url)
                 break
             except (urllib.error.HTTPError):
                 time.sleep(0.1)
             except KeyboardInterrupt:
-                self.robot2_flag=False
                 return
         # wait for robot2
-        try:
-            while self.robot2_flag:
-                time.sleep(0.01)
-        except (KeyboardInterrupt):
-            return
-            
+        robot2_thread.join()
+        # get logged data
+        while True:
+            try:
+                file_url='http://'+self.robot_ip2+'/ud1/log.txt'
+                res2 = urlopen(file_url)
+                break
+            except (urllib.error.HTTPError):
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                return
         
         # remove temporary TMP files
         if os.path.exists("TMP.LS"):
@@ -615,7 +606,78 @@ class FANUCClient(object):
         else:
             print("TMP.LS is deleted.")
 
-        return res.read(),self.robot2_data
+        return res1.read(),res2.read()
+    
+    def execute_motion_program_connect(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
+
+        if self.robot_ip2 is None:
+            print("There's no robot2 ip address.")
+            return
+
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[100]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+        # # close all previous digital output
+        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[101]%20=%20off'
+        urlopen(do_url)
+        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[102]%20=%20off'
+        urlopen(do_url)
+
+        # # save a temp
+        tpmp1.dump_program('TMP')
+        # # copy to robot via ftp
+        with open('TMP.LS','rb') as the_prog:
+            self.robot_ftp.storlines('STOR TMP.LS',the_prog)
+        # # save a temp
+        tpmp2.dump_program('TMP')
+        # # copy to robot via ftp
+        with open('TMP.LS','rb') as the_prog:
+            self.robot_ftp2.storlines('STOR TMP.LS',the_prog)
+        # return 1,2
+        # time.sleep(3)
+        
+        # set up robot2
+        motion_url='http://'+self.robot_ip2+'/karel/remote'
+        urlopen(motion_url)
+
+        # call motion
+        try:
+            motion_url='http://'+self.robot_ip+'/karel/remote'
+            res = urlopen(motion_url)
+        except (urllib.error.HTTPError,KeyboardInterrupt):
+            self.robot2_flag=False
+        # get logged data 1
+        while True:
+            try:
+                file_url='http://'+self.robot_ip+'/ud1/log.txt'
+                res1 = urlopen(file_url)
+                break
+            except (urllib.error.HTTPError):
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                return
+        # get logged data 2
+        while True:
+            try:
+                file_url='http://'+self.robot_ip2+'/ud1/log.txt'
+                res2 = urlopen(file_url)
+                break
+            except (urllib.error.HTTPError):
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                return
+            
+        # remove temporary TMP files
+        if os.path.exists("TMP.LS"):
+            os.remove("TMP.LS")
+        else:
+            print("TMP.LS is deleted.")
+
+        return res1.read(),res2.read()
 
 def multi_robot_coord():
     
