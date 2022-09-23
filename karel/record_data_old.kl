@@ -17,18 +17,13 @@ VAR
     period     : INTEGER -- recording period in milliseconds (8 ms to 127 ms)
     timeInt    : INTEGER -- actual time
     timeStr    : STRING[18] -- formated
-    sequence   : INTEGER  -- count iteration
     
     IntANGa1,IntANGa2,IntANGa3,IntANGa4,IntANGa5,IntANGa6    : REAL
     IntANGa1Str, IntANGa2Str, IntANGa3Str,IntANGa4Str, IntANGa5Str, IntANGa6Str: STRING[9]
     write_line : STRING[100]
 
-    IntANGa1Arr,IntANGa2Arr,IntANGa3Arr,IntANGa4Arr,IntANGa5Arr,IntANGa6Arr    : ARRAY[4000] OF REAL
-    timeIntArr  : ARRAY[4000] OF INTEGER
-
-    entry      : INTEGER  
+    entry      : INTEGER
     status     : INTEGER
-    i          : INTEGER -- loop counter
     -- tests
     test       : INTEGER
     clocky     : INTEGER
@@ -69,44 +64,59 @@ BEGIN -- execute the program
 
     -- get actual time and convert it into string
     GET_TIME(timeInt)
+    CNV_TIME_STR(timeInt, timeStr)
+
+    filename = 'UD1:'+'log'+'.txt'
     
     entry = 0
     status = 0
+    
+    -- tests
+    -- test = 0
+    -- clocky = 0
+    
+    
+    -- open the log file and overwrite previous
+    -- OPEN FILE logFile ('W', filename)
+    -- write actual time and make a carriage return
+    -- WRITE logFile (timeStr, CR)
+    -- CLOSE FILE logFile
 
-    sequence = 0
+
+    OPEN FILE logFile ('AP', filename)
+    -- WRITE logFile (timeStr, CR)
+    WRITE logFile ('timestamp,J1,J2,J3,J4,J5,J6', CR)
      -- start recording
     REPEAT
       -- clocky = clock_var
       -- test = clocky+period
-      sequence = sequence+1
       GET_INT_ANG(TRUE) -- call internal angle routine
-      IntANGa1Arr[sequence] = IntANGa1
-      IntANGa2Arr[sequence] = IntANGa2
-      IntANGa3Arr[sequence] = IntANGa3
-      IntANGa4Arr[sequence] = IntANGa4
-      IntANGa5Arr[sequence] = IntANGa5
-      IntANGa6Arr[sequence] = IntANGa6
-      timeIntArr[sequence] = clock_var
-      DELAY(period)
-    UNTIL(DOUT[101]=OFF)
-    -- stop recording
-    
-    -- write to log file
-    filename = 'UD1:'+'log'+'.txt'
-    OPEN FILE logFile ('AP', filename)
-    -- WRITE logFile (timeStr, CR)
-    WRITE logFile ('timestamp,J1,J2,J3,J4,J5,J6', CR)
-    FOR i=1 TO sequence DO
-      CNV_REAL_STR(IntANGa1Arr[i], 9, 4, IntANGa1Str)
-      CNV_REAL_STR(IntANGa2Arr[i], 9, 4, IntANGa2Str)
-      CNV_REAL_STR(IntANGa3Arr[i], 9, 4, IntANGa3Str)
-      CNV_REAL_STR(IntANGa4Arr[i], 9, 4, IntANGa4Str)
-      CNV_REAL_STR(IntANGa5Arr[i], 9, 4, IntANGa5Str)
-      CNV_REAL_STR(IntANGa6Arr[i], 9, 4, IntANGa6Str)
-      WRITE logFile(timeIntArr[i])
+      
+      CNV_REAL_STR(IntANGa1, 9, 4, IntANGa1Str)
+      CNV_REAL_STR(IntANGa2, 9, 4, IntANGa2Str)
+      CNV_REAL_STR(IntANGa3, 9, 4, IntANGa3Str)
+      CNV_REAL_STR(IntANGa4, 9, 4, IntANGa4Str)
+      CNV_REAL_STR(IntANGa5, 9, 4, IntANGa5Str)
+      CNV_REAL_STR(IntANGa6, 9, 4, IntANGa6Str)
+    --   WRITE logFile(clock_var)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa1Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa2Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa3Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa4Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa5Str)
+    --   WRITE logFile(',')
+    --   WRITE logFile(IntANGa6Str,CR)
+      WRITE logFile(clock_var)
       write_line=','+IntANGa1Str+','+IntANGa2Str+','+IntANGa3Str+','+IntANGa4Str+','+IntANGa5Str+','+IntANGa6Str
       WRITE logFile(write_line,CR)
-    ENDFOR
+      DELAY(period)
+    UNTIL(DOUT[101]=OFF)
+    -- stop recording, close log file
     CLOSE FILE logFile
 -- end of program
 END datarecorder
