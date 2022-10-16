@@ -307,7 +307,7 @@ class TPMotionProgram(object):
             mo += prog
             mo += '\n'
             line_num += 1
-        mo += '   '+str(line_num)+':  DO[10'+str(motion_group+2)+']=OFF ;\n'
+        mo += '   '+str(line_num)+':  R[8'+str(motion_group+1)+']=0 ;\n'
 
         # pose data
         mo += '/POS\n'
@@ -344,14 +344,14 @@ class TPMotionProgram(object):
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
-        mo += '   1:  DO[101]=ON ;\n   2:  RUN DATARECORDER ;\n'
+        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n'
         line_num=3
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
             mo += '\n'
             line_num += 1
-        mo += '   '+str(line_num)+':  DO[101]=OFF ;\n'
+        mo += '   '+str(line_num)+':  R[81]=0 ;\n'
 
         # pose data
         mo += '/POS\n'
@@ -443,14 +443,11 @@ class FANUCClient(object):
     def execute_motion_program_multi(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
 
         # # close all previous digital output
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[103]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[104]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
 
         # # save a temp
         tpmp1.dump_program_multi('TMPA',1)
@@ -492,14 +489,11 @@ class FANUCClient(object):
         assert tp_lead.t_num == tp_follow.t_num, "TP1 and TP2 must have exact same motions (target pose)."
 
         # # close all previous digital output
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[103]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[104]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
 
         # # save a temp
         tp_lead.dump_program_coord('TMP',tp_follow)
@@ -546,15 +540,17 @@ class FANUCClient(object):
             return
 
         # # close all previous digital output
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
         # # close all previous digital output
-        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip2+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
 
         # # save a temp
         tpmp1.dump_program('TMP')
@@ -616,17 +612,17 @@ class FANUCClient(object):
             return
 
         # # close all previous digital output
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[100]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
         # # close all previous digital output
-        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip2+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
+        try:
+            clear_reg_url='http://'+self.robot_ip2+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
 
         # # save a temp
         tpmp1.dump_program('TMP')

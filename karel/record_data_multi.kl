@@ -27,6 +27,8 @@ VAR
     test       : INTEGER
     clocky     : INTEGER
     PI         : REAL
+    record_flag: INTEGER
+    dummy_flag      : REAL
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 -- routine to get angle of axis
@@ -99,7 +101,8 @@ BEGIN -- execute the program
     OPEN FILE logFile ('AP', filename)
     -- WRITE logFile (timeStr, CR)
     WRITE logFile ('timestamp,J11,J12,J13,J14,J15,J16,J21,J22,J23,J24,J25,J26', CR)
-     -- start recording
+    -- start recording
+    record_flag = 1
     REPEAT
       -- clocky = clock_var
       -- test = clocky+period
@@ -144,7 +147,8 @@ BEGIN -- execute the program
       WRITE logFile(',')
       WRITE logFile(IntANG26Str,CR)
       DELAY(period)
-    UNTIL(DOUT[101]=OFF)
+      GET_REG(81, FALSE, record_flag, dummy_flag, status)
+    UNTIL(record_flag<=0)
     -- stop recording, close log file
     CLOSE FILE logFile
 -- end of program
