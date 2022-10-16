@@ -218,14 +218,14 @@ class TPMotionProgram(object):
         filename = 'TMP'
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
             mo += '\n'
             line_num += 1
-        mo += '   '+str(line_num)+':  DO[101]=OFF ;\n'
+        mo += '   '+str(line_num)+':  R[81]=0 ;\n'
 
         # pose data
         mo += '/POS\n'
@@ -256,14 +256,14 @@ class TPMotionProgram(object):
         
         # program name, attribute, motion
         mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  DO[101]=ON ;\n   4:  RUN DATARECORDER ;\n'
+        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
             mo += '\n'
             line_num += 1
-        mo += '   '+str(line_num)+':  DO[101]=OFF ;\n'
+        mo += '   '+str(line_num)+':  R[81]=0 ;\n'
 
         # pose data
         mo += '/POS\n'
@@ -405,11 +405,12 @@ class FANUCClient(object):
     
     def execute_motion_program(self, tpmp: TPMotionProgram):
 
-        # # close all previous digital output
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[101]%20=%20off'
-        urlopen(do_url)
-        do_url='http://'+self.robot_ip+'/kcl/set%20port%20dout%20[102]%20=%20off'
-        urlopen(do_url)
+        # # close all previous register
+        try:
+            clear_reg_url='http://'+self.robot_ip+'/karel/clear_reg'
+            res = urlopen(clear_reg_url)
+        except urllib.error.HTTPError:
+            pass
 
         # # save a temp
         tpmp.dump_program('TMP')

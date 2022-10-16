@@ -9,24 +9,25 @@ PROGRAM remote
 VAR
     STATUS      : INTEGER
     return_code : INTEGER
-    clock_var    : INTEGER
 -----------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------
 -- main routine
 BEGIN -- execute the program
     
-    -- delete previous ls and log
+    -- -- delete previous ls and log
     KCL('DELETE FILE md:\TMP.LS YES',STATUS)
     KCL('DELETE FILE ud1:\log.txt YES',STATUS)
 
-    -- -- copy ud1 tmp to mp
+    -- -- -- copy ud1 tmp to mp
     KCL('COPY ud1:\TMP.LS TO md:\TMP.LS',STATUS)
     KCL('DELETE FILE ud1:\TMP.LS YES',STATUS)
 
-    -- call LS
-    DOUT[102]=ON
-    WAIT FOR DOUT[102]=OFF
+    -- -- call LS
+    -- DOUT[102]=ON
+    -- WAIT FOR DOUT[102]=OFF
+    SET_INT_REG(80, 1, STATUS)
+    -- WAIT FOR R[80]<=0
 
     -- end
     return_code = 204
