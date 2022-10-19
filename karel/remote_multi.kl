@@ -28,8 +28,9 @@ BEGIN -- execute the program
     KCL('DELETE FILE ud1:\TMPB.LS YES',STATUS)
 
     -- call LS
-    DOUT[102]=ON
-    WAIT FOR DOUT[102]=OFF
+    -- DOUT[102]=ON
+    -- WAIT FOR DOUT[102]=OFF
+    SET_INT_REG(80, 1, STATUS)
 
     -- end
     return_code = 204

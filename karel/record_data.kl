@@ -23,8 +23,8 @@ VAR
     IntANGa1Str, IntANGa2Str, IntANGa3Str,IntANGa4Str, IntANGa5Str, IntANGa6Str: STRING[9]
     write_line : STRING[100]
 
-    IntANGa1Arr,IntANGa2Arr,IntANGa3Arr,IntANGa4Arr,IntANGa5Arr,IntANGa6Arr    : ARRAY[4000] OF REAL
-    timeIntArr  : ARRAY[4000] OF INTEGER
+    IntANGa1Arr,IntANGa2Arr,IntANGa3Arr,IntANGa4Arr,IntANGa5Arr,IntANGa6Arr    : ARRAY[5000] OF REAL
+    timeIntArr  : ARRAY[5000] OF INTEGER
 
     entry      : INTEGER  
     status     : INTEGER
@@ -67,7 +67,7 @@ BEGIN -- execute the program
     -- begin the clock time count
     CONNECT TIMER TO clock_var
     
-    period = 8 -- ms
+    period = 4 -- ms
 
     -- get actual time and convert it into string
     GET_TIME(timeInt)
