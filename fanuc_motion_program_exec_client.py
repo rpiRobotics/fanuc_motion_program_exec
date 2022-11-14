@@ -274,8 +274,9 @@ class TPMotionProgram(object):
                 mo+='   GP'+str(target.group)+':\n'
                 mo+='   UF : '+str(target.uframe)+', UT : '+str(target.utool)+',\n'
                 mo+='   J1 = '+format(round(target.robax[0],3),'.3f')+' deg,  J2 = '+format(round(target.robax[1],3),'.3f')+' deg,  J3 = '+format(round(target.robax[2],3)-round(target.robax[1],3),'.3f')+' deg,\n'
-                mo+='   J4 = '+format(round(target.robax[3],3),'.3f')+' deg,  J5 = '+format(round(target.robax[4],3),'.3f')+' deg,  J6 = '+format(round(target.robax[5],3),'.3f')+' deg\n'
+                mo+='   J4 = '+format(round(target.robax[3],3),'.3f')+' deg,  J5 = '+format(round(target.robax[4],3),'.3f')+' deg,  J6 = '+format(round(target.robax[5],3),'.3f')+' deg,\n'
                 mo+='};\n'
+                # mo+='   E1=     0.000  mm\n};\n'
             if type(target) == robtarget:
                 mo+='P['+str(t_num+1)+']{\n'
                 mo+='   GP'+str(target.group)+':\n'
