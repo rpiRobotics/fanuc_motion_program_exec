@@ -14,6 +14,9 @@ For dual robot arms, the following additional option is required.
 
 - Multi-group
 
+## Improtance Notice
+- The module utilize register number 80~83. Please leave them as 0 before using the module and don't modify the register.
+
 ## Installation on Robots
 
 ### RoboGuide
