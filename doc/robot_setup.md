@@ -79,11 +79,11 @@ In the python module, you have the flexibility to choose which tool/user frame y
 
 ## Module Program Load
 
-Right click on the `Files`, `Add`,and add `remote.kl`, `record_data.kl` in the `karel` folder and `MAIN.LS` in the `tp` folder.
+Right click on the `Files`, `Add`,and add `remote.kl`, `record_data.kl`, `clear_reg.kl` in the `karel` folder and `MAIN.LS` in the `tp` folder.
 
 ![](figures/step_16.png)
 
-Expand the `Files` tab by clicking the plus button on the left. Right click on `MAIN.LS`, `Load`. RoboGuide will load the `LS` program to the controller. Right click on `record_data.kl` and `Build`. A window will show that the translation is successful. Redo the same process with `remote.kl`. RoboGuide first compile and then load the `.kl` or `Karel` program to the controller. You should also see `record_data.pc` and `remote.pc`. They are the compiled karel program. Expand the `Programs` tab and you should see `DATARECORDER`, `REMOTE` and `MAIN` are listed.
+Expand the `Files` tab by clicking the plus button on the left. Right click on `MAIN.LS`, `Load`. RoboGuide will load the `LS` program to the controller. Right click on `record_data.kl` and `Build`. A window will show that the translation is successful. Repeat the same process with `remote.kl` and `clear_reg.kl`. RoboGuide first compile and then load the `.kl` or `Karel` program to the controller. You should also see `record_data.pc` and `remote.pc`. They are the compiled karel program. Expand the `Programs` tab and you should see `DATARECORDER`, `REMOTE` and `MAIN` are listed.
 
 ![](figures/step_17.png)
 
