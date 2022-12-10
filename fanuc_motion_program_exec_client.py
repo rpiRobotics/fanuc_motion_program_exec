@@ -58,6 +58,10 @@ def R2wpr(R):
     w=math.degrees(math.atan2(2*(q[0]*q[1]+q[2]*q[3]),1.-2*(q[1]**2+q[2]**2)))
     return [w,p,r]
 
+def wpr2R(wpr):
+    
+    return rox.rot([0,0,1],math.radians(wpr[2]))@rox.rot([0,1,0],math.radians(wpr[1]))@rox.rot([1,0,0],math.radians(wpr[0]))
+
 def getrobtarget(pose,ref_q,robot,group,uframe,utool):
     
     qall=robot.inv(pose.p,pose.R)
@@ -497,7 +501,8 @@ class FANUCClient(object):
             pass
 
         # # save a temp
-        tp_lead.dump_program_coord('TMP',tp_follow)
+        # tp_lead.dump_program_coord('TMP',tp_follow)
+        tp_follow.dump_program_coord('TMP',tp_lead)
 
         # # copy to robot via ftp
         with open('TMP.LS','rb') as the_prog:
