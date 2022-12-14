@@ -257,9 +257,16 @@ class TPMotionProgram(object):
         return mo
 
     def dump_program(self,filename):
+
+        ## get program name
+        filename_rev = filename[::-1]
+        if filename_rev.find('/') == -1:
+            progname=filename
+        else:
+            progname = filename[len(filename)-filename_rev.find('/'):]
         
         # program name, attribute, motion
-        mo = '/PROG  '+filename+'\n/ATTR\n/MN\n'
+        mo = '/PROG  '+progname+'\n/ATTR\n/MN\n'
         mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
         line_num=5
         for prog in self.progs:
@@ -303,8 +310,15 @@ class TPMotionProgram(object):
         dg = '*,*,*,*,*'
         dg=dg[:2*(motion_group-1)]+'1'+dg[2*(motion_group-1)+1:]
 
+        ## get program name
+        filename_rev = filename[::-1]
+        if filename_rev.find('/') == -1:
+            progname=filename
+        else:
+            progname = filename[len(filename)-filename_rev.find('/'):]
+
         # program name, attribute, motion
-        mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
+        mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
         mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
         line_num=3
         for prog in self.progs:
@@ -346,8 +360,15 @@ class TPMotionProgram(object):
         # motion group
         dg = '1,1,*,*,*'
 
+        ## get program name
+        filename_rev = filename[::-1]
+        if filename_rev.find('/') == -1:
+            progname=filename
+        else:
+            progname = filename[len(filename)-filename_rev.find('/'):]
+
         # program name, attribute, motion
-        mo = '/PROG  '+filename+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
+        mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
         mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n'
         line_num=3
