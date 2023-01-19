@@ -73,9 +73,10 @@ def getrobtarget(pose,ref_q,robot,group,uframe,utool):
         robt.rot[i]=wpr[i]
     return robt
 
-def joint2robtarget(q,robot,group,uframe,utool):
+def joint2robtarget(q,robot,group,uframe,utool,uframe_base_T=rox.Transform(np.eye(3),[0,0,0])):
     
     pose_tar = robot.fwd(q)
+    pose_tar = uframe_base_T*pose_tar
 
     # joint 5
     if q[4] <= 0:
