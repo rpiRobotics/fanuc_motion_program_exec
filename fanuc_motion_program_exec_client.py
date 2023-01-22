@@ -259,6 +259,10 @@ class TPMotionProgram(object):
 
     def dump_program(self,filename):
 
+        # motion group
+        dg = '*,*,*,*,*'
+        dg=dg[:2*(self.target[0].group-1)]+'1'+dg[2*(self.target[0].group-1)+1:]
+
         ## get program name
         filename_rev = filename[::-1]
         if filename_rev.find('/') == -1:
@@ -267,9 +271,12 @@ class TPMotionProgram(object):
             progname = filename[len(filename)-filename_rev.find('/'):]
         
         # program name, attribute, motion
-        mo = '/PROG  '+progname+'\n/ATTR\n/MN\n'
-        mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
-        line_num=5
+        # mo = '/PROG  '+progname+'\n/ATTR\n/MN\n'
+        # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
+        # line_num=5
+        mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
+        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n'
+        line_num=3
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
@@ -286,7 +293,7 @@ class TPMotionProgram(object):
                 mo+='   GP'+str(target.group)+':\n'
                 mo+='   UF : '+str(target.uframe)+', UT : '+str(target.utool)+',\n'
                 mo+='   J1 = '+format(round(target.robax[0],3),'.3f')+' deg,  J2 = '+format(round(target.robax[1],3),'.3f')+' deg,  J3 = '+format(round(target.robax[2],3)-round(target.robax[1],3),'.3f')+' deg,\n'
-                mo+='   J4 = '+format(round(target.robax[3],3),'.3f')+' deg,  J5 = '+format(round(target.robax[4],3),'.3f')+' deg,  J6 = '+format(round(target.robax[5],3),'.3f')+' deg,\n'
+                mo+='   J4 = '+format(round(target.robax[3],3),'.3f')+' deg,  J5 = '+format(round(target.robax[4],3),'.3f')+' deg,  J6 = '+format(round(target.robax[5],3),'.3f')+' deg\n'
                 mo+='};\n'
                 # mo+='   E1=     0.000  mm\n};\n'
             if type(target) == robtarget:
