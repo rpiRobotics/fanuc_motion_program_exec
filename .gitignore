@@ -1,2 +1,4 @@
 *.pc
 *.tp
+build/*
+fanuc_motion_program_exec.egg-info/*

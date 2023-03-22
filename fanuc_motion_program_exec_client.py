@@ -275,8 +275,8 @@ class TPMotionProgram(object):
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
         # line_num=5
         mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
-        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n'
-        line_num=3
+        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   1.00(sec) ;\n'
+        line_num=4
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
@@ -378,8 +378,8 @@ class TPMotionProgram(object):
         # program name, attribute, motion
         mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
-        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n'
-        line_num=3
+        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   1.00(sec) ;\n'
+        line_num=4
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
