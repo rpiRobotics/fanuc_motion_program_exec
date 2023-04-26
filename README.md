@@ -19,7 +19,7 @@ For dual robot arms, the following additional option is required.
 - Multi-group (J686)
 - Coordinated Motion (J601)
 
-## Improtance Notice
+#### Others
 - The module utilize register number 80~83. Please leave them as 0 before using the module and don't modify the register.
 
 ## Installation on Robots
