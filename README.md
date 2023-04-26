@@ -1,8 +1,12 @@
 # fanuc_motion_program_exec
 
-`fanuc_motion_program_exec` is a python module to run a squence of motion primitives (i.e. `moveL`, `moveC`, `moveJ`) on a fanuc controller in a simple way. The python module now support controlling a single or dual robots.
+[![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://github.com/rpiRobotics/abb_motion_program_exec)
 
-## Pre-request
+`fanuc_motion_program_exec` provides a simple way to download and run a sequence of `MoveJ`, `MoveL`, `MoveC` commands on an FANUC R-30iB robot controller. This program is intended to be a proof of concept for more sophisticated controller interfaces. Multi-move control of two robots is also supported.
+
+## Prerequisite
+
+### Robot Controller
 
 You will need a physical FANUC robot or `RoboGuide`, the FANUC robot simulation. The following robot options are required.
 
@@ -12,7 +16,8 @@ You will need a physical FANUC robot or `RoboGuide`, the FANUC robot simulation.
 
 For dual robot arms, the following additional option is required.
 
-- Multi-group
+- Multi-group (J686)
+- Coordinated Motion (J601)
 
 ## Improtance Notice
 - The module utilize register number 80~83. Please leave them as 0 before using the module and don't modify the register.
@@ -29,7 +34,7 @@ The installation of modulel in RoboGuide includes setting up a cell and loading 
 
 ### Real Robot
 
-TBA
+For the real robot, follow the same procedure as in RoboGuide. In addition, you will need to insert an extra USB flash drive to the robot controller.
 
 ## Installation of Python Module
 
@@ -39,19 +44,15 @@ The `fanuc_motion_program_exec` module can be install to local Python installati
 pip install . --user
 ```
 
-Note that the module is only tested with `python3`.
-
-The module required the installation of [rpi_general_robotics_toolbox_py](https://github.com/rpiRobotics/rpi_general_robotics_toolbox_py).
-
 ## Usage
 
-### RoboGuide
+### On Robot Controller
 
 Execute `MAIN` by selecting the `MAIN` program in the `Programs` tab and pressing the play button on top. You should see the play button turn green. Note: this step is **Extremely important!!!**. You need to make sure `MAIN` is runninng whenever you want to use the module
 
 ![](doc/figures/usage.png)
 
-Further more, remeber to click on the right `UT` (utool) and `UF` (uframe) you will be using.
+Further more, remeber to select the right `UT` (utool) and `UF` (uframe) you will be using.
 
 ![](doc/figures/ut_uf.png)
 
@@ -224,6 +225,47 @@ with open("fanuc_log.csv","wb") as f:
 print(res.decode('utf-8'))
 ```
 
+## Multi-Robot Example (with coordination)
+
+Two robots can be controller using Robot Options `Multi-Group Motion (J601)`/ See [multi_robot_coord_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_coord_setup.md) for setup instructions.
+
+The two robot needs to have different `group_num` which are given in the `robtarget` or `jointtarget`. They must have exactly the same number of motion commands. Execute `MAIN` in on the robot before using the python module. The `execute_motion_program_coord` function of `FANUCClient` is used to send the one tp program to the controller to control both robots.
+
+```
+tp_lead = TPMotionProgram()
+    tp_follow = TPMotionProgram()
+
+    # robtarget(motion group, uframe, utool, [x,y,z], [w,p,r], confdata, external axis)
+    # jointtarget(motion group, uframe, utool, [j1,j2,j3,j4,j5,j6], confdata, external axis)
+
+    # these are for follower robot, follower must be motion group 1
+    jt11 = jointtarget(1,1,2,[-49.7,4.3,-30.9,-20.9,-35.8,52.1],[0]*6)
+    pt12 = robtarget(1,1,2,[1383.1,-484.0,940.6],[171.5,-26.8,-9.8],confdata('N','U','T',0,0,0),[0]*6)
+    pt13 = robtarget(1,1,2,[1166.0,0,1430.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+
+    # these are for leader robot, leader must be motion group 2
+    jt21 = jointtarget(2,1,2,[38.3,23.3,-10.7,45.7,-101.9,-48.3],[0]*6)
+    pt22 = robtarget(2,1,2,[994.0,924.9,1739.5],[163.1,1.5,-1.0],confdata('N','U','T',0,0,0),[0]*6)
+    pt23 = robtarget(2,1,2,[1620.0,0,1930.0],[180.0,0,0],confdata('N','U','T',0,0,0),[0]*6)
+
+    # two program must have the exact same motion primitives
+    tp_follow.moveJ(jt11,100,'%',-1) # moveJ does not support coordinated motion
+    tp_follow.moveL(pt12,500,'mmsec',100,'COORD') # add 'COORD' option
+    tp_follow.moveL(pt13,500,'mmsec',-1,'COORD')
+
+    tp_lead.moveJ(jt21,100,'%',-1)
+    tp_lead.moveL(pt22,500,'mmsec',100,'COORD')
+    tp_lead.moveL(pt23,500,'mmsec',-1,'COORD')
+
+    client = FANUCClient()
+    res = client.execute_motion_program_coord(tp_lead,tp_follow) # lead put in front
+
+    with open("fanuc_log.csv","wb") as f:
+        f.write(res)
+    
+    print(res.decode('utf-8'))
+```
+
 ## Multi-Robot Example (without coordination)
 
 Two robots can be controller using Robot Options `Multi-Group Motion (J601)`/ See [multi_robot_setup.md](https://github.com/eric565648/fanuc_motion_program_exec/blob/main/doc/multi_robot_setup.md) for setup instructions.
@@ -262,3 +304,13 @@ with open("fanuc_log.csv","wb") as f:
 
 print(res.decode('utf-8'))
 ```
+
+## License
+
+Apache 2.0 License, Copyright 2022 Rensselaer Polytechnic Institute
+
+## Acknowledgment
+
+This work was supported in part by Subaward No. ARM-TEC-21-02-F19 from the Advanced Robotics for Manufacturing ("ARM") Institute under Agreement Number W911NF-17-3-0004 sponsored by the Office of the Secretary of Defense. ARM Project Management was provided by Christopher Adams. The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of either ARM or the Office of the Secretary of Defense of the U.S. Government. The U.S. Government is authorized to reproduce and distribute reprints for Government purposes, notwithstanding any copyright notation herein.
+
+![](doc/figures/arm_logo.jpg)

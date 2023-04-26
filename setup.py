@@ -7,6 +7,7 @@ setup(
     url='https://github.com/eric565648/fanuc_motion_program_exec',
     py_modules=['fanuc_motion_program_exec_client'],
     install_requires=[
-        'numpy'
+        'numpy',
+        'general_robotics_toolbox'
     ]
 )
