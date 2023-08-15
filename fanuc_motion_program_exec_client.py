@@ -710,6 +710,58 @@ class FANUCClient(object):
             print("TMP.LS is deleted.")
 
         return res1.read(),res2.read()
+    
+    def get_joint_angle(self,read_N=1):
+        
+        jN=6
+        
+        joint_readings=[]
+        for ave_i in range(read_N):
+            # read R1 
+            r1_joints=[]
+            try:
+                cmd_url='http://'+self.robot_ip+'/KCL/SH%20VAR%20$MOR_GRP_SV[1].$CUR_SV_ANG%20BINARY'
+                res=urlopen(cmd_url)
+                res=res.read().decode('utf-8')
+                # print(test)
+                res=res.split('REAL')
+                res=res[1]
+                res=res.split('\n')
+                for i in range(jN):
+                    r1_joints.append(np.degrees(float(res[i+1][7:])))
+            
+            except urllib.error.HTTPError:
+                pass
+            # read R2
+            r2_joints=[]
+            try:
+                cmd_url='http://'+self.robot_ip+'/KCL/SH%20VAR%20$MOR_GRP_SV[2].$CUR_SV_ANG%20BINARY'
+                res=urlopen(cmd_url)
+                res=res.read().decode('utf-8')
+                # print(test)
+                res=res.split('REAL')
+                res=res[1]
+                res=res.split('\n')
+                for i in range(jN):
+                    r2_joints.append(np.degrees(float(res[i+1][7:])))
+            
+            except urllib.error.HTTPError:
+                pass
+            
+            joint_readings.append(np.append(r1_joints,r2_joints))
+        
+        return joint_readings
+
+def read_joint_test():
+    
+    client = FANUCClient()
+    
+    read_N=10
+    st=time.perf_counter()
+    res = client.get_joint_angle(read_N=read_N)
+    et=time.perf_counter()
+    print("Total time:",et-st)
+    print("Time per Read:",(et-st)/read_N)
 
 def multi_robot_coord():
     
@@ -818,11 +870,15 @@ def single_robot():
 def main():
 
     # single robot
-    single_robot()
+    # single_robot()
+    
     # multi robot
     # multi_robot()
     # multi robot with coordinated motion
     # multi_robot_coord()
+    
+    # read joint
+    read_joint_test()
 
 if __name__ == "__main__":
     main()
