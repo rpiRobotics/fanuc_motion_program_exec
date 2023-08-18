@@ -797,7 +797,6 @@ class FANUCClient(object):
         '''
         
         port_str = io_port+"[{:4d}]".format(int(io_num))
-        print(port_str)
         
         cmd_url='http://'+self.robot_ip+'/MD/IOSTATE.DG'
         res=urlopen(cmd_url)
@@ -810,12 +809,33 @@ class FANUCClient(object):
             return False
         else:
             raise RuntimeWarning('Specified port no existed.')
+        
+    def set_ioport(self,io_port,io_num,io_on):
+        '''
+        io_port: DIN,DOUT,RIN,ROUT...
+        '''
+        
+        if io_port not in ['DIN','DOUT','RIN','ROUT']:
+            raise AssertionError('IO port not supported.')
+        
+        port_str = io_port+"[{:d}]".format(int(io_num))+'='
+        if io_on:
+            port_str+='ON'
+        else:
+            port_str+='OFF'
+        
+        cmd_url='http://'+self.robot_ip+'/KCL/SET%20PORT%20'+port_str
+        print(cmd_url)
+        res=urlopen(cmd_url)
 
 def read_io_test():
     
     client = FANUCClient()
+    client.set_ioport('DOUT',10,True)
     res = client.read_ioport('DOUT',10)
-
+    print("The port is:",res)
+    client.set_ioport('DOUT',10,False)
+    res = client.read_ioport('DOUT',10)
     print("The port is:",res)
 
 def read_joint_test():
