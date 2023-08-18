@@ -218,6 +218,45 @@ class TPMotionProgram(object):
         mo += ';'
 
         self.progs.append(mo)
+    
+    def setIO(self,io_port,io_num,io_on):
+        '''
+        Set IO on or off
+        '''
+        
+        if io_port not in ['DO','RO']:
+            raise AssertionError('IO port not supported.')
+        
+        mo = io_port+'['+str(int(io_num))+']='
+        if io_on:
+            mo+='ON'
+        else:
+            mo+='OFF'
+        mo+=' ;'
+        self.progs.append(mo)
+    
+    def waittime(self,sec):
+        '''
+        Wait for sec
+        '''
+        mo = 'WAIT   '+str(round(sec,2))+'(sec) ;'
+        self.progs.append(mo)
+    
+    def waitIO(self,io_port,io_num,wait_on):
+        '''
+        Wait for IO on or off
+        '''
+        
+        if io_port not in ['DI','DO','RI','RO']:
+            raise AssertionError('IO port not supported.')
+        
+        mo = 'WAIT '+io_port+'['+str(int(io_num))+']='
+        if wait_on:
+            mo+='ON'
+        else:
+            mo+='OFF'
+        mo+=' ;'
+        self.progs.append(mo)
 
     def get_tp(self):
         filename = 'TMP'
@@ -751,6 +790,33 @@ class FANUCClient(object):
             joint_readings.append(np.append(r1_joints,r2_joints))
         
         return joint_readings
+    
+    def read_ioport(self,io_port,io_num):
+        '''
+        io_port: DIN,DOUT,RIN,ROUT...
+        '''
+        
+        port_str = io_port+"[{:4d}]".format(int(io_num))
+        print(port_str)
+        
+        cmd_url='http://'+self.robot_ip+'/MD/IOSTATE.DG'
+        res=urlopen(cmd_url)
+        res=res.read().decode('utf-8')
+        res=res.split(port_str)
+        res=res[1][:4]
+        if res=='  ON':
+            return True
+        elif res==' OFF':
+            return False
+        else:
+            raise RuntimeWarning('Specified port no existed.')
+
+def read_io_test():
+    
+    client = FANUCClient()
+    res = client.read_ioport('DOUT',10)
+
+    print("The port is:",res)
 
 def read_joint_test():
     
@@ -878,7 +944,10 @@ def main():
     # multi_robot_coord()
     
     # read joint
-    read_joint_test()
+    # read_joint_test()
+    
+    # read IO
+    read_io_test()
 
 if __name__ == "__main__":
     main()
