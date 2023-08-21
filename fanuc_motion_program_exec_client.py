@@ -296,7 +296,7 @@ class TPMotionProgram(object):
         mo += '/END\n'
         return mo
 
-    def dump_program(self,filename):
+    def dump_program(self,filename,record_joint=True):
 
         # motion group
         dg = '*,*,*,*,*'
@@ -314,13 +314,21 @@ class TPMotionProgram(object):
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n   3:  R[81]=1 ;\n   4:  RUN DATARECORDER ;\n'
         # line_num=5
         mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
-        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   1.00(sec) ;\n'
-        line_num=4
+        if record_joint:
+            mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   0.50(sec) ;\n'
+            line_num=4
+        else:
+            mo += '   1:  R[81]=1 ;\n'
+            line_num=2
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
             mo += '\n'
             line_num += 1
+        # no record dummy
+        if not record_joint:
+            mo += '   '+str(line_num)+':  RUN DATARECORDER ;\n   '+str(line_num+1)+':  WAIT   0.50(sec) ;\n'
+            line_num+=2
         mo += '   '+str(line_num)+':  R[81]=0 ;\n'
 
         # pose data
@@ -402,7 +410,7 @@ class TPMotionProgram(object):
         with open(filename+'.LS', "w") as f:
             f.write(mo)
     
-    def dump_program_coord(self,filename,tpmp):
+    def dump_program_coord(self,filename,tpmp,record_joint=True):
 
         # motion group
         dg = '1,1,*,*,*'
@@ -417,13 +425,22 @@ class TPMotionProgram(object):
         # program name, attribute, motion
         mo = '/PROG  '+progname+'\n/ATTR\nDEFAULT_GROUP	= '+dg+';\n/MN\n'
         # mo += '   1:  UFRAME_NUM='+str(self.uframe_num)+' ;\n   2:  UTOOL_NUM='+str(self.tool_num)+' ;\n'
-        mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   1.00(sec) ;\n'
+        if record_joint:
+            mo += '   1:  R[81]=1 ;\n   2:  RUN DATARECORDER ;\n   3:  WAIT   0.50(sec) ;\n'
+            line_num=4
+        else:
+            mo += '   1:  R[81]=1 ;\n'
+            line_num=2
         line_num=4
         for prog in self.progs:
             mo += '   '+str(line_num)+':'
             mo += prog
             mo += '\n'
             line_num += 1
+        # no record dummy
+        if not record_joint:
+            mo += '   '+str(line_num)+':  RUN DATARECORDER ;\n   '+str(line_num+1)+':  WAIT   0.50(sec) ;\n'
+            line_num+=2
         mo += '   '+str(line_num)+':  R[81]=0 ;\n'
 
         # pose data
@@ -476,7 +493,7 @@ class FANUCClient(object):
             self.robot_ftp2.login()
             self.robot_ftp2.cwd('UD1:')
     
-    def execute_motion_program(self, tpmp: TPMotionProgram):
+    def execute_motion_program(self, tpmp: TPMotionProgram, record_joint=True,non_block=False):
 
         # # close all previous register
         try:
@@ -486,7 +503,7 @@ class FANUCClient(object):
             pass
 
         # # save a temp
-        tpmp.dump_program('TMP')
+        tpmp.dump_program('TMP',record_joint=record_joint)
 
         # # copy to robot via ftp
         with open('TMP.LS','rb') as the_prog:
@@ -497,21 +514,24 @@ class FANUCClient(object):
             res = urlopen(motion_url)
         except urllib.error.HTTPError:
             pass
+        
+        if not non_block:
+            while True:
+                try:
+                    file_url='http://'+self.robot_ip+'/ud1/log.txt'
+                    res = urlopen(file_url)
+                    break
+                except urllib.error.HTTPError:
+                    time.sleep(1)
 
-        while True:
-            try:
-                file_url='http://'+self.robot_ip+'/ud1/log.txt'
-                res = urlopen(file_url)
-                break
-            except urllib.error.HTTPError:
-                time.sleep(1)
+            if os.path.exists("TMP.LS"):
+                os.remove("TMP.LS")
+            else:
+                print("TMP.LS is deleted.")
 
-        if os.path.exists("TMP.LS"):
-            os.remove("TMP.LS")
+            return res.read()
         else:
-            print("TMP.LS is deleted.")
-
-        return res.read()
+            return
     
     def execute_motion_program_multi(self, tpmp1: TPMotionProgram, tpmp2: TPMotionProgram):
 
@@ -557,7 +577,7 @@ class FANUCClient(object):
 
         return res.read()
     
-    def execute_motion_program_coord(self, tp_lead: TPMotionProgram, tp_follow: TPMotionProgram):
+    def execute_motion_program_coord(self, tp_lead: TPMotionProgram, tp_follow: TPMotionProgram, record_joint=True,non_block=False):
 
         assert tp_lead.t_num == tp_follow.t_num, "TP1 and TP2 must have exact same motions (target pose)."
 
@@ -570,7 +590,7 @@ class FANUCClient(object):
 
         # # save a temp
         # tp_lead.dump_program_coord('TMP',tp_follow)
-        tp_follow.dump_program_coord('TMP',tp_lead)
+        tp_follow.dump_program_coord('TMP',tp_lead,record_joint=record_joint)
 
         # # copy to robot via ftp
         with open('TMP.LS','rb') as the_prog:
@@ -582,20 +602,23 @@ class FANUCClient(object):
         except urllib.error.HTTPError:
             pass
 
-        while True:
-            try:
-                file_url='http://'+self.robot_ip+'/ud1/log.txt'
-                res = urlopen(file_url)
-                break
-            except urllib.error.HTTPError:
-                time.sleep(1)
+        if not non_block:
+            while True:
+                try:
+                    file_url='http://'+self.robot_ip+'/ud1/log.txt'
+                    res = urlopen(file_url)
+                    break
+                except urllib.error.HTTPError:
+                    time.sleep(1)
 
-        if os.path.exists("TMP.LS"):
-            os.remove("TMP.LS")
+            if os.path.exists("TMP.LS"):
+                os.remove("TMP.LS")
+            else:
+                print("TMP.LS is deleted.")
+
+            return res.read()
         else:
-            print("TMP.LS is deleted.")
-
-        return res.read()
+            return
     
     def run_motion_thread(self,robot_ip):
 
@@ -825,7 +848,6 @@ class FANUCClient(object):
             port_str+='OFF'
         
         cmd_url='http://'+self.robot_ip+'/KCL/SET%20PORT%20'+port_str
-        print(cmd_url)
         res=urlopen(cmd_url)
 
 def read_io_test():
