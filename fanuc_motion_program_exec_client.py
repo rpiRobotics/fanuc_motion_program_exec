@@ -852,7 +852,7 @@ class FANUCClient(object):
 
 def read_io_test():
     
-    client = FANUCClient()
+    client = FANUCClient('192.168.0.1')
     client.set_ioport('DOUT',10,True)
     res = client.read_ioport('DOUT',10)
     print("The port is:",res)
@@ -862,11 +862,12 @@ def read_io_test():
 
 def read_joint_test():
     
-    client = FANUCClient()
+    client = FANUCClient('192.168.0.1')
     
-    read_N=10
+    read_N=3
     st=time.perf_counter()
     res = client.get_joint_angle(read_N=read_N)
+    print(res)
     et=time.perf_counter()
     print("Total time:",et-st)
     print("Time per Read:",(et-st)/read_N)
@@ -986,10 +987,10 @@ def main():
     # multi_robot_coord()
     
     # read joint
-    # read_joint_test()
+    read_joint_test()
     
     # read IO
-    read_io_test()
+    # read_io_test()
 
 if __name__ == "__main__":
     main()
