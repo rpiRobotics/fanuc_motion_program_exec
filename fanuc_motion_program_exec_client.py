@@ -296,7 +296,7 @@ class TPMotionProgram(object):
         mo += '/END\n'
         return mo
 
-    def dump_program(self,filename,record_joint=True):
+    def dump_program(self,filename,record_joint=True,non_block=False):
 
         # motion group
         dg = '*,*,*,*,*'
@@ -325,8 +325,8 @@ class TPMotionProgram(object):
             mo += prog
             mo += '\n'
             line_num += 1
-        # no record dummy
-        if not record_joint:
+        # no record dummy and blocking dummy
+        if not record_joint and not non_block:
             mo += '   '+str(line_num)+':  RUN DATARECORDER ;\n   '+str(line_num+1)+':  WAIT   0.50(sec) ;\n'
             line_num+=2
         mo += '   '+str(line_num)+':  R[81]=0 ;\n'
@@ -410,7 +410,7 @@ class TPMotionProgram(object):
         with open(filename+'.LS', "w") as f:
             f.write(mo)
     
-    def dump_program_coord(self,filename,tpmp,record_joint=True):
+    def dump_program_coord(self,filename,tpmp,record_joint=True,non_block=False):
 
         # motion group
         dg = '1,1,*,*,*'
@@ -438,7 +438,7 @@ class TPMotionProgram(object):
             mo += '\n'
             line_num += 1
         # no record dummy
-        if not record_joint:
+        if not record_joint and not non_block:
             mo += '   '+str(line_num)+':  RUN DATARECORDER ;\n   '+str(line_num+1)+':  WAIT   0.50(sec) ;\n'
             line_num+=2
         mo += '   '+str(line_num)+':  R[81]=0 ;\n'
@@ -503,7 +503,7 @@ class FANUCClient(object):
             pass
 
         # # save a temp
-        tpmp.dump_program('TMP',record_joint=record_joint)
+        tpmp.dump_program('TMP',record_joint=record_joint,non_block=non_block)
 
         # # copy to robot via ftp
         with open('TMP.LS','rb') as the_prog:
@@ -590,7 +590,7 @@ class FANUCClient(object):
 
         # # save a temp
         # tp_lead.dump_program_coord('TMP',tp_follow)
-        tp_follow.dump_program_coord('TMP',tp_lead,record_joint=record_joint)
+        tp_follow.dump_program_coord('TMP',tp_lead,record_joint=record_joint,non_block=non_block)
 
         # # copy to robot via ftp
         with open('TMP.LS','rb') as the_prog:
