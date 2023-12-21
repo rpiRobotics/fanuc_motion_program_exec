@@ -8,7 +8,7 @@ from PyQt5.QtGui import QPixmap, QFont
 import sys,os,time,traceback,platform,subprocess
 
 from general_robotics_toolbox import *
-from fanuc_motion_program_exec_client import *
+from fanuc_motion_program_exec import *
 
 class BaseGUI(QDialog):
     def __init__(self, parent=None):
