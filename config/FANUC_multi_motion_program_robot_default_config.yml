@@ -1,0 +1,288 @@
+robot_info:
+  device_info:
+    device:
+      name: fanuc_robot_multi
+    manufacturer:
+      name: FANUC
+      uuid: d80db3c2-3de8-41e3-97f9-62765a7063b8
+    model:
+      name: multi_robot
+      uuid: 52d11a44-9f73-4e4a-be0e-3bee4873961c
+    user_description: FANUC lrmate200id Robot
+    serial_number: 123456789
+    device_classes:
+      - class_identifier:
+          name: robot
+          uuid: 39b513e7-21b9-4b49-8654-7537473030eb
+        subclasses: 
+          - serial
+          - serial_six_axis
+          - cobot
+    implemented_types:
+      - com.robotraconteur.robotics.robot.Robot
+  robot_type: serial
+  robot_capabilities:
+  - jog_command
+  - trajectory_command
+  - position_command
+  - velocity_command
+  chains:
+  - kin_chain_identifier: robot_arm1
+    H:
+    - x: 0.0
+      y: 0.0
+      z: 1.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 1.0
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 1.0
+      y: 0.0
+      z: 0.0
+    P:
+    - x: 0.0
+      y: 0.0
+      z: 330 
+    - x: 50
+      y: 0.0
+      z: 0.0
+    - x: 0.
+      y: 0.0
+      z: 330
+    - x: 0.0
+      y: 0.0
+      z: 35
+    - x: 335
+      y: 0.0
+      z: 0.0
+    - x: 80
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+    flange_identifier: robot1_tool0
+    flange_pose:
+      orientation:
+        w: 0.7071067811882787
+        x: 0.0
+        y: 0.7071067811882787
+        z: 0.0
+      position:
+        x: 0
+        y: 0.0
+        z: 0
+    joint_numbers:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  - kin_chain_identifier: robot_arm2
+    H:
+    - x: 0.0
+      y: 0.0
+      z: 1.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 1.0
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 1.0
+      z: 0.0
+    - x: 1.0
+      y: 0.0
+      z: 0.0
+    P:
+    - x: 0.0
+      y: 0.0
+      z: 450 
+    - x: 150
+      y: 0.0
+      z: 0.0
+    - x: 0.
+      y: 0.0
+      z: 600
+    - x: 0.0
+      y: 0.0
+      z: 200
+    - x: 640
+      y: 0.0
+      z: 0.0
+    - x: 100
+      y: 0.0
+      z: 0.0
+    - x: 0.0
+      y: 0.0
+      z: 0.0
+    flange_identifier: robot2_tool0
+    flange_pose:
+      orientation:
+        w: 0.7071067811882787
+        x: 0.0
+        y: 0.7071067811848163
+        z: 0.0
+      position:
+        x: 0
+        y: 0.0
+        z: 0
+    joint_numbers:
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+  joint_info:
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_1
+    joint_limits:
+      effort: 1000
+      lower: -2.96705972
+      upper: 2.96705972
+      velocity: 7.85398163
+      acceleration: 10
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_2
+    joint_limits:
+      effort: 1000
+      lower: -1.74532925
+      upper: 2.53072742
+      velocity: 6.63225116
+      acceleration: 15
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_3
+    joint_limits:
+      effort: 1000
+      lower: -3.57792497
+      upper: 1.22173048
+      velocity: 9.07571211
+      acceleration: 15
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_4
+    joint_limits:
+      effort: 1000
+      lower: -3.31612557
+      upper: 3.31612557
+      velocity: 9.59931089
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_5
+    joint_limits:
+      effort: 1000
+      lower: -2.18166156
+      upper:  2.18166156
+      velocity: 9.51204442
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_6
+    joint_limits:
+      effort: 1000
+      lower: -6.28318530718
+      upper: 6.28318530718
+      velocity: 17.45329252
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_1
+    joint_limits:
+      effort: 1000
+      lower: -2.96705972
+      upper: 2.96705972
+      velocity: 3.66519142
+      acceleration: 10
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_2
+    joint_limits:
+      effort: 1000
+      lower: -1.57079632
+      upper: 2.79252680
+      velocity: 3.31612557
+      acceleration: 15
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_3
+    joint_limits:
+      effort: 1000
+      lower: -3.14159265
+      upper: 1.55334303
+      velocity: 3.66519142
+      acceleration: 15
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_4
+    joint_limits:
+      effort: 1000
+      lower: -3.31612557
+      upper: 3.31612557
+      velocity: 6.98131700
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_5
+    joint_limits:
+      effort: 1000
+      lower: -2.44346095
+      upper:  2.44346095
+      velocity: 6.98131700
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+  - default_effort_units: newton_meter
+    default_units: radian
+    joint_identifier: joint_6
+    joint_limits:
+      effort: 1000
+      lower: -6.28318530718
+      upper: 6.28318530718
+      velocity: 10.47197551
+      acceleration: 20
+    joint_type: revolute
+    passive: false
+supported_commands:
+  - MoveAbsJ
+  - MoveJ
+  - MoveL
+  - MoveC
+  - WaitTime
