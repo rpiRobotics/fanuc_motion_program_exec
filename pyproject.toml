@@ -15,3 +15,16 @@ readme = "README.md"
 
 [project.urls]
 homepage = "https://github.com/eric565648/fanuc_motion_program_exec"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+robotraconteur = [
+    "robotraconteur",
+    "robotraconteurcompanion",
+    "drekar-launch-process"
+]
+
+[tool.setuptools.package-data]
+"fanuc_motion_program_exec.robotraconteur" = ["*.robdef"]
