@@ -1,4 +1,4 @@
-from fanuc_motion_program_exec import *
+from fanuc_motion_program_exec_client import *
 
 tp = TPMotionProgram()
 

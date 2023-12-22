@@ -1,4 +1,4 @@
-from fanuc_motion_program_exec import *
+from fanuc_motion_program_exec_client import *
 
 client = FANUCClient('192.168.0.1')
     

@@ -27,7 +27,7 @@ robotraconteur = [
 ]
 
 [tool.setuptools.package-data]
-"fanuc_motion_program_exec.robotraconteur" = ["*.robdef"]
+"fanuc_motion_program_exec_client.robotraconteur" = ["*.robdef"]
 
 [project.scripts]
-fanuc-motion-program-exec-robotraconteur = "fanuc_motion_program_exec.robotraconteur.fanuc_motion_program_exec_robotraconteur:main"
+fanuc-motion-program-exec-robotraconteur = "fanuc_motion_program_exec_client.robotraconteur.fanuc_motion_program_exec_robotraconteur:main"
