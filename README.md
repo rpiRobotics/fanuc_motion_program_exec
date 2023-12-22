@@ -264,6 +264,45 @@ with open("fanuc_log.csv","wb") as f:
 print(res.decode('utf-8'))
 ```
 
+# Robot Raconteur Service
+
+A Robot Raconteur service is available to allow a client to execute multi-move programs. The service
+uses a standards track service definition `experimental.robotics.motion_program` that will provide interoperability
+between multiple robot types. Due to the differences in the robot commands between controller implementations there 
+may be slight differences in the commands between robots, but in general the commands are very similar.
+
+When installing the module, include the `robotraconteur` option to get the required dependencies:
+
+```bash
+python -m pip install fanuc-motion-program-exec[robotraconteur]
+```
+
+Start the service, specifying a robot info file:
+
+```
+fanuc-motion-program-exec-robotraconteur --mp-robot-info-file=config/FANUC_lrmate200id_motion_program_robot_default_config.yml
+```
+
+Optionally start using a module if the entrypoint does not work:
+
+```
+python -m fanuc_motion_program_exec_client.robotraconteur --mp-robot-info-file=config/FANUC_lrmate200id_motion_program_robot_default_config.yml
+```
+
+The following options are supported:
+
+* `--mp-robot-info-file=` - The info file that specifies information about the robot
+* `--mp-robot-ip=` - The connection IP address of the robot. Defaults to `127.0.0.1`
+   for use with RoboGuide virtual controllers. Set `127.0.0.1` to the WAN IP address of the robot.
+* `--mp-robot-username=` - The robot controller username. Defaults to "robot"
+* `--mp-robot2-ip=` - Connection IP of second robot controller
+* `--mp-robot2-username=` - Username for second robot controller
+
+Examples for a single robot and multi-move robots are in the `examples/robotraconteur` directory. The motion
+programs make heavy use of `varvalue` types to allow for flexibility in the motion program contents.
+The Python type `RR.VarValue` is used to represent the `varvalue` type. See the Robot Raconteur Python documentation
+for more inforamtion on how `RR.VarValue` works and why it is necessary.
+
 ## License
 
 Apache 2.0 License, Copyright 2022 Rensselaer Polytechnic Institute
