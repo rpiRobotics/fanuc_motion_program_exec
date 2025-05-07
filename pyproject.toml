@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "fanuc_motion_program_exec"
+version = "2.0.0"
+description = "Module to execute motion commands on FANUC robots and log results"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.6"
+dependencies = [    
+    "numpy",    
+    "general_robotics_toolbox"
+]
+readme = "README.md"
+
+[project.urls]
+homepage = "https://github.com/eric565648/fanuc_motion_program_exec"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+robotraconteur = [
+    "robotraconteur",
+    "robotraconteurcompanion",
+    "drekar-launch-process"
+]
+
+[tool.setuptools.package-data]
+"fanuc_motion_program_exec_client.robotraconteur" = ["*.robdef"]
+
+[project.scripts]
+fanuc-motion-program-exec-robotraconteur = "fanuc_motion_program_exec_client.robotraconteur.fanuc_motion_program_exec_robotraconteur:main"
